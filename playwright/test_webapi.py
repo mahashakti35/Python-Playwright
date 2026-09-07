@@ -1,3 +1,4 @@
+import json
 import time
 
 from playwright.sync_api import Playwright,expect
@@ -7,6 +8,9 @@ from utils.api import ApiUtils
 def test_e2e_web_api(playwright:Playwright):
     page = playwright.chromium.launch(headless=False).new_context().new_page()
 
+    with open('data/credentials.json') as f:
+        test_data = json.load(f)
+        print(test_data)
 
     api_uitls = ApiUtils()
     api_uitls.createOrder(playwright)
