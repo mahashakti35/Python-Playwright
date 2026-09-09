@@ -1,28 +1,31 @@
 import json
 import time
-
 from playwright.sync_api import Playwright,expect
-
+import pytest
+from pageObjects.login import LoginPage
+from pageObjects.dashboard import DashboardPage
 from utils.api import ApiUtils
 
-def test_e2e_web_api(playwright:Playwright):
+
+with open('playwright/data/credentials.json') as f:
+    test_data = json.load(f)
+    user_credentials_list = test_data["user_credentials"]
+
+@pytest.mark.parametrize('user_credentials',user_credentials_list)
+def test_e2e_web_api(playwright:Playwright,user_credentials):
+    username = user_credentials["userEmail"]
+    password = user_credentials["password"]
     page = playwright.chromium.launch(headless=False).new_context().new_page()
-
-    with open('data/credentials.json') as f:
-        test_data = json.load(f)
-        print(test_data)
-
     api_uitls = ApiUtils()
-    api_uitls.createOrder(playwright)
-    
-    page.goto("https://rahulshettyacademy.com/client")
-    page.get_by_placeholder("email@example.com").fill("mahashakti@gmail.com")
-    page.get_by_placeholder("enter your passsword").fill("Sonusanu@1")
-    page.get_by_role("button", name = "Login").click()
-    page.get_by_role("button", name = "Orders").click()
+    orderID = api_uitls.createOrder(playwright,user_credentials)
+ 
+    loginPage = LoginPage(page)
+    loginPage.navigate()
+    dashboardPage = loginPage.login(username,password)
+    orderHistoryPage = dashboardPage.selectOrdersLink()
+    orderDetailsPage = orderHistoryPage.selectOrder(orderID)
+    orderDetailsPage.verifyOrderMessage()
     # page.get_by_role("button", name = "View").first.click()
-    expect(page.get_by_text(api_uitls.orderID)).to_be_visible()
-    orderRow = page.locator("tr").filter(has_text= api_uitls.orderID)
-    orderRow.get_by_role("button", name = "View").click()
-    expect(page.locator('.tagline')).to_have_text("Thank you for Shopping With Us")
+    # expect(page.get_by_text(api_uitls.orderID)).to_be_visible()
+    
     
