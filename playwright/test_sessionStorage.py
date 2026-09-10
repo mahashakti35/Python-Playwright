@@ -3,7 +3,8 @@ from playwright.sync_api import Page, Playwright, expect
 
 from utils.api import ApiUtils;
 
-def test_session_storage(page:Page,playwright:Playwright):
+def test_session_storage(browserInstance,playwright:Playwright):
+    page = browserInstance
     api_utils = ApiUtils()
     getToken = api_utils.get_token_from_login(playwright)
     page.add_init_script(f"""localStorage.setItem('token','{getToken}')""")

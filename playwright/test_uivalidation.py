@@ -3,7 +3,8 @@ import time
 from playwright.sync_api import Page, expect
 
 # id - #id, tag - tag, class - .class
-def test_dynamicUIValidation(page:Page):
+def test_dynamicUIValidation(browserInstance):
+    page = browserInstance
     page.goto("https://rahulshettyacademy.com/loginpagePractise/")
     page.get_by_label("Username:").fill("rahulshettyacademy")
     page.get_by_label("Password:").fill("Learning@830$3mK2")
@@ -22,7 +23,8 @@ def test_dynamicUIValidation(page:Page):
     expect(page.locator(".media-body")).to_have_count(2)
     # time.sleep(5)
 
-def test_childPagetest(page:Page):
+def test_childPagetest(browserInstance):
+    page = browserInstance
     page.goto("https://rahulshettyacademy.com/loginpagePractise/")
 
     with page.expect_popup() as new_page:

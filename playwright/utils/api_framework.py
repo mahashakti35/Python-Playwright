@@ -6,15 +6,17 @@ orderPayLoad = {"orders": [{"country": "India","productOrderedId": Iphone}]}
 class ApiUtils:
     base_url = "https://rahulshettyacademy.com"
     # orderID = ""
-    def get_token_from_login(self,playwright:Playwright):
+    def get_token_from_login(self,playwright:Playwright,user_credentials):
+        email = user_credentials["userEmail"]
+        password = user_credentials["password"]
         context = playwright.request.new_context(base_url= self.base_url)
-        response = context.post("/api/ecom/auth/login",data = {"userEmail": "mahashakti@gmail.com", "userPassword": "Sonusanu@1"})
+        response = context.post("/api/ecom/auth/login",data = {"userEmail": email, "userPassword": password})
         assert response.ok
         responseBody = response.json()
         return responseBody["token"]
 
-    def createOrder(self,playwright:Playwright):
-        token = self.get_token_from_login(playwright)
+    def createOrder(self,playwright:Playwright,user_credentials):
+        token = self.get_token_from_login(playwright,user_credentials)
         context = playwright.request.new_context(base_url= self.base_url)
         response=context.post("/api/ecom/order/create-order",data = orderPayLoad,headers={
             "Authorization":token,
